@@ -4,7 +4,7 @@ A Simple Cloudflare Workers ShortURL Forwarder
 Setup your own serverless personalised/bitly/tinyURL forwarder for free on Cloudflare Workers.
 
 ## Features
-- set up on a sub-domain you already own (or register a slick new short domain) and use it for redirects, e.g. **som.au/github** => **github.com/theprojectsomething**
+- set up on a sub-domain you already own (or register a slick new short domain) and use it for redirects, e.g. **[thesom.au/github](https://thesom.au/github)** => **[github.com/theprojectsomething](https://github.com/theprojectsomething)**
 - the code is forwarding-domain agnostic, so domain names can be switched out without updating code
 - takes a list of **direct** and **dynamic** routes (see the examples below) and **301 redirects** incoming requests
 - pass a `?debug` search param to get a json response
@@ -14,17 +14,21 @@ Setup your own serverless personalised/bitly/tinyURL forwarder for free on Cloud
 
 Routes are currently defined and edited directly in the worker (**src/index.js**). There are two types of route:
 
-1. **Direct routes**
-These map directly from `[a.domain/tiny-path => b.domain/not/so-tiny/path]` based on an *exact match of the path*
-2. **Dynamic routes**
-  - These allow a path to be appended to a url, that can be inserted into the redirect url using a `$1` token, e.g.
-    the dynamic route `[/tiny-path => b.domain/not/so-tiny/$1/path/]` redirects:
-      -  **/tiny-path/dynamic?a=b** => **b.domain/not/so-tiny/dynamic/path/?a=b**
-      -  **/tiny-path** => **404 Not found**
-  - Redirect urls without a token simply append the path, e.g. the dynamic route `[/tiny-path => b.domain]` redirects:
+1. **Direct routes**  
+These map routes directly from **[/tiny-path]** => **[b.domain/not/so-tiny/path]** based on an *exact match of the path*
+
+2. **Dynamic routes**  
+These allow a path to be appended to a redirect url, or optionally inserted using a `$1` token, e.g:
+    
+    - **[/tiny-path]** => **[b.domain]** (without a token) redirects the following:
       -  **/tiny-path/dynamic?a=b** => **b.domain/dynamic?a=b**
-      -  **/tiny-path** => **404 Not found**
-  - Note the second example in both cases above. If no path is appended to a dynamic route it will return a **404 Not found**. If you want to allow for this case use a direct route in addition to the dynamic one.
+      -  **/tiny-path** => **404 Not found**[^1]
+
+    - **[/tiny-path]** => **[b.domain/not/so-tiny/$1/path/]** (with a token) redirects the following:
+      -  **/tiny-path/dynamic?a=b** => **b.domain/not/so-tiny/dynamic/path/?a=b**
+      -  **/tiny-path** => **404 Not found**[^1]
+      
+[^1]: Note the second case in both dynamic examples above. If no path is appended to a dynamic route it will return a **404 Not found**. If you want to allow for this, use a direct route in addition to the dynamic one.
 
 ## Quick start: deployed to the cloud in <2mins
 
